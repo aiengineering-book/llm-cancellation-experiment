@@ -85,6 +85,8 @@ Things to know before running it:
 - The balance has two decimals of CNY and lags by roughly 10 minutes. The script waits up to 25 minutes (`SETTLE_SECONDS`).
 - `SKIP_CONTROL=1 CNY_PER_TOKEN=...` skips the control run and reuses a known cost per token.
 - Use a quiet account. Other requests during the run would change the balance.
+- `ABORT_AFTER_MS` counts from the first content chunk, so each aborted request is cut mid-generation. Run it at two values (for example 3000 and 15000) to check that billing scales with the abort point.
+- Aborted streams never deliver `usage`, so received tokens are estimated from characters (`CHARS_PER_TOKEN`, default 5.2, measured on a completed control run).
 
 The measured result is written up in the article.
 

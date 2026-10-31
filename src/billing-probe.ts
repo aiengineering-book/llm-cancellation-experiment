@@ -26,6 +26,10 @@ const abortAfterMs = Number(process.env.ABORT_AFTER_MS ?? 3000);
 const settleSeconds = Number(process.env.SETTLE_SECONDS ?? 1500);
 const skipControl = process.env.SKIP_CONTROL === '1';
 const cnyPerTokenOverride = Number(process.env.CNY_PER_TOKEN ?? 0);
+// Aborted streams never deliver `usage`, so received tokens are estimated from
+// characters. A completed 8,000-token control run measured about 5.2 characters
+// per token for this essay prompt; adjust for other prompts or languages.
+const charsPerToken = Number(process.env.CHARS_PER_TOKEN ?? 5.2);
 
 if (!apiKey) throw new Error('Set LLM_API_KEY first');
 
@@ -200,7 +204,7 @@ const abortedCost = b1 - b2;
 
 // --- 3. COMPARE ---
 const receivedChars = aborted.reduce((s, r) => s + r.receivedChars, 0);
-const approxReceivedTokens = Math.round(receivedChars / 4);
+const approxReceivedTokens = Math.round(receivedChars / charsPerToken);
 const cnyPerToken =
   cnyPerTokenOverride > 0
     ? cnyPerTokenOverride
@@ -211,7 +215,7 @@ const cnyPerToken =
 console.log('\n[probe] summary');
 console.log(`  control:  ${controlTokens} tokens -> ${fmt(controlCost)} CNY`);
 console.log(`  aborted:  balance ${fmt(b1)} -> ${fmt(b2)}  (cost ${fmt(abortedCost)} CNY over ${abortedRuns} runs)`);
-console.log(`  aborted runs received about ${approxReceivedTokens} tokens in total (chars/4)`);
+console.log(`  aborted runs received about ${approxReceivedTokens} tokens in total (chars / ${charsPerToken})`);
 if (cnyPerToken) {
   const impliedTokens = Math.round(abortedCost / cnyPerToken);
   const ifStopped = Math.round(approxReceivedTokens * cnyPerToken * 100) / 100;
