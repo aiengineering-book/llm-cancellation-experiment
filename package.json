@@ -1,0 +1,21 @@
+{
+  "name": "llm-cancellation-boundary-experiment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "provider": "tsx src/mock-provider.ts",
+    "client": "tsx src/client.ts",
+    "experiment:honor": "tsx src/experiment.ts honor",
+    "experiment:ignore": "tsx src/experiment.ts ignore",
+    "experiment:llm": "tsx src/llm-abort.ts",
+    "experiment:billing": "tsx src/billing-probe.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5"
+  }
+}
